@@ -1,0 +1,7 @@
+pollutant,maximum_value,maximum_city,maximum_time,minimum_value,minimum_city,minimum_time
+pm10,265.4,Sialkot,2026-10-30 09:00:00,6.1,Islamabad,2026-10-29 12:00:00
+pm2_5,154.6,Lahore,2026-10-29 21:00:00,5.8,Islamabad,2026-10-29 12:00:00
+carbon_monoxide,4706.0,Lahore,2026-10-29 20:00:00,128.0,Islamabad,2026-10-26 04:00:00
+nitrogen_dioxide,127.6,Lahore,2026-10-29 21:00:00,0.5,Sialkot,2026-10-28 13:00:00
+sulphur_dioxide,33.3,Lahore,2026-10-29 20:00:00,3.5,Islamabad,2026-10-30 04:00:00
+ozone,216.0,Lahore,2026-10-29 13:00:00,0.0,Islamabad,2026-10-27 07:00:00

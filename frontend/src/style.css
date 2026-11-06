@@ -1,0 +1,1257 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+
+/* ==========================================
+   PAKISTAN AIR QUALITY MONITORING DASHBOARD
+   LAVENDER BASE + AQI SPECTRUM THEME
+   Every pollutant has its own hue.
+========================================== */
+
+:root {
+  /* Base surfaces (kept soft so pollutant colours stand out) */
+  --bg-main: #F6F4FA;
+  --bg-sidebar: #EAE5F1;
+  --card-bg: #FFFFFF;
+  --border-color: #E7E1EC;
+
+  /* UI accents */
+  --accent-green: #5FA88A;
+  --accent-cyan: #5B8DB8;
+  --accent-purple: #766B91;
+  --accent-orange: #D9A05B;
+
+  /* Text */
+  --text-main: #4E465C;
+  --text-muted: #8A8296;
+
+  /* Shadows */
+  --shadow: 0 4px 18px rgba(118, 107, 145, 0.07);
+  --shadow-hover: 0 8px 24px rgba(118, 107, 145, 0.14);
+
+  /* ---------- AQI STATUS SPECTRUM ---------- */
+  --good: #5DAE86;
+  --moderate: #E3C45B;
+  --unhealthy-sensitive: #E59A5E;
+  --unhealthy: #D9646E;
+  --very-unhealthy: #9C6BB5;
+  --hazardous: #7E4A66;
+
+  --aqi-gradient: linear-gradient(90deg,
+    var(--good) 0%,
+    var(--moderate) 22%,
+    var(--unhealthy-sensitive) 42%,
+    var(--unhealthy) 62%,
+    var(--very-unhealthy) 82%,
+    var(--hazardous) 100%);
+
+  /* ---------- POLLUTANT IDENTITY (6 distinct hues) ---------- */
+  --pollutant-pm25: #E0707A;   /* coral rose  */
+  --pollutant-pm10: #E8A04A;   /* amber       */
+  --pollutant-co:   #8C79C9;   /* violet      */
+  --pollutant-no2:  #4A90C8;   /* sky blue    */
+  --pollutant-so2:  #A3BC45;   /* lime        */
+  --pollutant-o3:   #36B0A0;   /* teal        */
+
+  /* Soft fills */
+  --pollutant-pm25-soft: rgba(224, 112, 122, 0.13);
+  --pollutant-pm10-soft: rgba(232, 160, 74, 0.14);
+  --pollutant-co-soft:   rgba(140, 121, 201, 0.14);
+  --pollutant-no2-soft:  rgba(74, 144, 200, 0.13);
+  --pollutant-so2-soft:  rgba(163, 188, 69, 0.16);
+  --pollutant-o3-soft:   rgba(54, 176, 160, 0.14);
+
+  /* Deep tones for text on soft fills */
+  --pollutant-pm25-ink: #A83F4A;
+  --pollutant-pm10-ink: #9A6417;
+  --pollutant-co-ink:   #5F4C9C;
+  --pollutant-no2-ink:  #2B6494;
+  --pollutant-so2-ink:  #62781A;
+  --pollutant-o3-ink:   #1F7C70;
+}
+
+/* GLOBAL */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(900px 400px at 100% -10%, rgba(224,112,122,0.07), transparent 60%),
+    radial-gradient(800px 400px at 20% -10%, rgba(54,176,160,0.07), transparent 60%),
+    var(--bg-main);
+  background-attachment: fixed;
+  color: var(--text-main);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.layout { min-height: 100vh; }
+
+/* SIDEBAR */
+
+aside {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 220px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  padding: 27px 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+/* AQI spectrum edge on the sidebar */
+aside::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 3px;
+  background: linear-gradient(180deg,
+    var(--good), var(--moderate), var(--unhealthy-sensitive),
+    var(--unhealthy), var(--very-unhealthy), var(--hazardous));
+  opacity: 0.85;
+}
+
+.logo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font: 800 21px Manrope;
+  color: var(--accent-purple);
+}
+
+.logo svg {
+  width: 36px;
+  height: 36px;
+  padding: 7px;
+  background: #DCD4E8;
+  border-radius: 10px;
+}
+
+aside p {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin: 34px 0 12px;
+}
+
+aside a {
+  padding: 13px;
+  color: #716A80;
+  text-decoration: none;
+  font-size: 13px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+aside a:hover {
+  background: #DCD5E8;
+  color: var(--accent-purple);
+}
+
+aside a.active {
+  background: #DCD5E8;
+  color: var(--accent-purple);
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--accent-purple);
+}
+
+.asidefoot {
+  margin-top: auto;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.8;
+  border-top: 1px solid var(--border-color);
+  padding-top: 17px;
+}
+
+/* MAIN CONTENT */
+
+main {
+  margin-left: 220px;
+  padding: 0 36px 28px;
+  max-width: 1600px;
+}
+
+/* HEADER with AQI scale underline */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 27px 0;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 140px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--aqi-gradient);
+}
+
+header small {
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+h1, h2 {
+  font-family: Manrope, sans-serif;
+  color: var(--text-main);
+}
+
+h1 { font-size: 25px; margin: 7px 0; }
+
+header p, .sub {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+/* BUTTONS */
+
+.actions { display: flex; gap: 9px; }
+
+button, select {
+  border: 1px solid #E2DCE9;
+  background: #FFFFFF;
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button { display: flex; gap: 7px; align-items: center; }
+
+button:hover { background: #F0ECF5; border-color: #C8BED8; }
+
+.primary {
+  background: var(--accent-purple);
+  color: #FFFFFF;
+  border: 0;
+  font-weight: 700;
+}
+
+button.primary:hover { background: #655A7D; color: #FFFFFF; }
+
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* SECTIONS */
+
+section { padding-top: 26px; scroll-margin-top: 12px; }
+
+.sectionhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h2 { font-size: 18px; margin: 0 0 7px; }
+
+/* STATISTICS CARDS */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
+  margin-top: 15px;
+}
+
+.stats article {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats article:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.stats svg { color: var(--accent-purple); }
+
+.stats small {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.stats strong { font: 700 22px Manrope; color: var(--text-main); }
+
+.stats .status { font-size: 15px; }
+
+/* AQI status helpers: use on any element */
+.aqi-good       { color: var(--good); }
+.aqi-moderate   { color: #B8962F; }
+.aqi-sensitive  { color: #C47A3C; }
+.aqi-unhealthy  { color: var(--unhealthy); }
+.aqi-very       { color: var(--very-unhealthy); }
+.aqi-hazardous  { color: var(--hazardous); }
+
+.aqi-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+.aqi-pill.good      { background: var(--good); }
+.aqi-pill.moderate  { background: var(--moderate); color: #5A4A10; }
+.aqi-pill.sensitive { background: var(--unhealthy-sensitive); }
+.aqi-pill.unhealthy { background: var(--unhealthy); }
+.aqi-pill.very      { background: var(--very-unhealthy); }
+.aqi-pill.hazardous { background: var(--hazardous); }
+
+/* AQI scale bar (put <div class="aqi-scale"></div> anywhere) */
+.aqi-scale {
+  height: 8px;
+  border-radius: 8px;
+  background: var(--aqi-gradient);
+  margin-top: 12px;
+}
+
+/* ==========================================
+   POLLUTANT ANALYTICS — FILTER BAR
+========================================== */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 18px;
+  box-shadow: var(--shadow);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.filter-group select,
+.filter-group input {
+  border: 1px solid #E2DCE9;
+  background: #FFFFFF;
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-group select:hover,
+.filter-group input:hover { border-color: #C8BED8; }
+
+.filter-group select:focus,
+.filter-group input:focus {
+  outline: none;
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(118, 107, 145, 0.12);
+}
+
+.filters .actions { margin-left: auto; }
+
+/* ==========================================
+   POLLUTANT SUMMARY CARDS
+   Each card gets its own colour wash + accent
+========================================== */
+
+.pollutant-summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 13px;
+  margin-top: 15px;
+}
+
+.pollutant-summary article {
+  --p: var(--accent-purple);
+  --p-soft: rgba(118, 107, 145, 0.1);
+  --p-ink: var(--accent-purple);
+  background:
+    radial-gradient(120px 90px at 100% 0%, var(--p-soft), transparent 70%),
+    var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: grid;
+  gap: 6px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pollutant-summary article::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--p);
+}
+
+.pollutant-summary article:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--p);
+}
+
+.pollutant-summary small {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--p-ink);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.pollutant-summary strong { font: 700 20px Manrope; color: var(--text-main); }
+
+.pollutant-summary span.unit {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+[data-pollutant="pm25"] { --p: var(--pollutant-pm25); --p-soft: var(--pollutant-pm25-soft); --p-ink: var(--pollutant-pm25-ink); }
+[data-pollutant="pm10"] { --p: var(--pollutant-pm10); --p-soft: var(--pollutant-pm10-soft); --p-ink: var(--pollutant-pm10-ink); }
+[data-pollutant="co"]   { --p: var(--pollutant-co);   --p-soft: var(--pollutant-co-soft);   --p-ink: var(--pollutant-co-ink); }
+[data-pollutant="no2"]  { --p: var(--pollutant-no2);  --p-soft: var(--pollutant-no2-soft);  --p-ink: var(--pollutant-no2-ink); }
+[data-pollutant="so2"]  { --p: var(--pollutant-so2);  --p-soft: var(--pollutant-so2-soft);  --p-ink: var(--pollutant-so2-ink); }
+[data-pollutant="o3"]   { --p: var(--pollutant-o3);   --p-soft: var(--pollutant-o3-soft);   --p-ink: var(--pollutant-o3-ink); }
+
+/* Pollutant tag you can reuse in tables / legends */
+.pollutant-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--p-soft, #F1EEF5);
+  color: var(--p-ink, var(--text-main));
+}
+.pollutant-tag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--p, var(--accent-purple));
+}
+
+/* ==========================================
+   CHARTS
+========================================== */
+
+.chart {
+  height: 300px;
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.chart-title,
+.chart h3 {
+  color: #554D68;
+  font-family: Manrope, sans-serif;
+  font-weight: 700;
+}
+
+.chart-card {
+  --p: var(--accent-purple);
+  --p-soft: rgba(118, 107, 145, 0.1);
+  background:
+    linear-gradient(180deg, var(--p-soft), transparent 90px),
+    #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--p);
+  border-radius: 14px;
+  padding: 18px 18px 10px;
+  margin-top: 14px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s ease;
+}
+
+.chart-card:hover { box-shadow: var(--shadow-hover); }
+
+.chart-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.chart-card-head h3 {
+  margin: 0;
+  font-family: Manrope, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #554D68;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-card-head h3 .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--p);
+  box-shadow: 0 0 0 4px var(--p-soft);
+}
+
+.chart-card-head p { margin: 3px 0 0; font-size: 11px; color: var(--text-muted); }
+
+.chart-card-head .unit-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--p-ink, var(--text-muted));
+  background: var(--p-soft, #F1EEF5);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.chart-card .chart-body { height: 280px; width: 100%; }
+
+/* Dots work standalone too */
+.dot { background: var(--p, var(--accent-purple)); }
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 13px;
+  margin-top: 14px;
+}
+
+/* ==========================================
+   CHART TOOLTIP
+========================================== */
+
+.chart-tooltip {
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--p, var(--accent-purple));
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(118, 107, 145, 0.14);
+  font-size: 11px;
+  color: var(--text-main);
+  font-family: 'DM Sans', sans-serif;
+  pointer-events: none;
+}
+
+.chart-tooltip .tooltip-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.chart-tooltip .tooltip-value { font: 700 14px Manrope; color: var(--text-main); }
+.chart-tooltip .tooltip-unit { font-size: 10px; color: var(--text-muted); margin-left: 4px; }
+
+/* ==========================================
+   CHART LEGEND
+========================================== */
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.chart-legend .legend-item { display: flex; align-items: center; gap: 6px; }
+
+.chart-legend .legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  background: var(--p, var(--accent-purple));
+}
+
+/* ==========================================
+   MATRIX / HEATMAP
+========================================== */
+
+.matrix { display: grid; gap: 5px; margin-top: 14px; }
+
+.matrixrow {
+  display: grid;
+  grid-template-columns: 60px repeat(6, minmax(30px, 1fr));
+  gap: 5px;
+  align-items: center;
+}
+
+.matrixrow b { font-size: 11px; color: var(--text-muted); }
+
+.matrixrow span {
+  height: 30px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: default;
+}
+
+.matrixrow span:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(118, 107, 145, 0.18);
+  z-index: 1;
+}
+
+/* ==========================================
+   TABLES
+========================================== */
+
+.tablewrap {
+  overflow: auto;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-top: 13px;
+  box-shadow: var(--shadow);
+}
+
+table { border-collapse: collapse; width: 100%; white-space: nowrap; }
+
+th, td {
+  text-align: left;
+  padding: 13px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 11px;
+}
+
+th { color: #655D76; background: #F0ECF5; font-weight: 700; }
+td { color: #716A80; }
+tbody tr:hover td { background: #F8F6FA; }
+
+/* ==========================================
+   ERROR / EMPTY / LOADING
+========================================== */
+
+.error {
+  margin-top: 17px;
+  padding: 13px;
+  background: #F9EAED;
+  border: 1px solid #EBCBD2;
+  border-radius: 8px;
+  color: #A64E63;
+  font-size: 12px;
+}
+
+.empty {
+  margin-top: 17px;
+  padding: 25px;
+  background: #EAF2ED;
+  border: 1px solid #D0E1D6;
+  border-radius: 8px;
+  color: #547C68;
+  font-size: 12px;
+  text-align: center;
+}
+
+.loading {
+  margin-top: 17px;
+  padding: 25px;
+  background: #F1EEF5;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.loading::after {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 8px;
+  vertical-align: -2px;
+  border: 2px solid #D8D0E3;
+  border-top-color: var(--accent-purple);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation-duration: 2s !important; }
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+footer {
+  padding: 30px 0;
+  color: var(--text-muted);
+  font-size: 10px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 25px;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #F0EDF4; }
+::-webkit-scrollbar-thumb { background: #D0C8DB; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #A99DBB; }
+
+/* ==========================================
+   TABLET RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+  .pollutant-summary { grid-template-columns: repeat(3, 1fr); }
+  .chart-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  aside {
+    position: static;
+    width: auto;
+    height: auto;
+    display: block;
+    padding: 13px 17px;
+  }
+
+  aside { position: relative; }
+  aside::after { inset: auto 0 0 0; width: auto; height: 3px;
+    background: var(--aqi-gradient); }
+
+  aside p, .asidefoot { display: none; }
+
+  aside nav, aside {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  aside .logo { margin-right: 8px; }
+  aside a { display: inline-block; padding: 8px 12px; font-size: 12px; }
+
+  main { margin: 0; padding: 0 17px 25px; }
+
+  header { align-items: flex-start; gap: 15px; flex-direction: column; }
+
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .pollutant-summary { grid-template-columns: repeat(2, 1fr); }
+
+  .filters { flex-direction: column; align-items: stretch; }
+  .filter-group { min-width: 0; }
+  .filters .actions { margin-left: 0; }
+
+  .chart-card .chart-body { height: 240px; }
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE
+========================================== */
+
+@media (max-width: 520px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stats article { padding: 12px; }
+  .stats strong { font-size: 18px; }
+
+  .pollutant-summary { grid-template-columns: 1fr 1fr; }
+  .pollutant-summary article { padding: 12px; }
+  .pollutant-summary strong { font-size: 16px; }
+
+  .actions { flex-wrap: wrap; }
+
+  .chart { height: 260px; padding: 7px; }
+  .chart-card { padding: 12px 12px 6px; }
+  .chart-card .chart-body { height: 220px; }
+  .chart-card-head { flex-direction: column; gap: 6px; }
+
+  .matrixrow { grid-template-columns: 42px repeat(6, minmax(0, 1fr)); gap: 3px; }
+  .matrixrow span { font-size: 8px; height: 25px; }
+  .matrixrow b { font-size: 9px; }
+
+  table { white-space: normal; }
+  th, td { padding: 10px 8px; font-size: 10px; }
+}
+
+/* ==========================================
+   OVERVIEW STAT BOXES — one interactive colour each
+========================================== */
+
+.stats article {
+  --c: #766B91;
+  --c-soft: rgba(118, 107, 145, 0.12);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-top: 3px solid var(--c);
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+              background 0.25s ease, border-color 0.25s ease;
+}
+
+.stats article:nth-child(1) { --c: #E0707A; --c-soft: rgba(224,112,122,0.14); } /* records  - coral  */
+.stats article:nth-child(2) { --c: #4A90C8; --c-soft: rgba(74,144,200,0.14); }  /* cities   - blue   */
+.stats article:nth-child(3) { --c: #8C79C9; --c-soft: rgba(140,121,201,0.15); } /* pollutants - violet */
+.stats article:nth-child(4) { --c: #36B0A0; --c-soft: rgba(54,176,160,0.15); }  /* status   - teal   */
+
+.stats article svg {
+  color: var(--c);
+  background: var(--c-soft);
+  padding: 7px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.stats article small { color: var(--text-muted); transition: color 0.25s ease; }
+.stats article strong { transition: color 0.25s ease; }
+
+.stats article:hover {
+  transform: translateY(-5px);
+  background: linear-gradient(160deg, var(--c-soft), #FFFFFF 70%);
+  border-color: var(--c);
+  box-shadow: 0 12px 28px var(--c-soft), 0 0 0 1px var(--c);
+}
+
+.stats article:hover svg {
+  background: var(--c);
+  color: #FFFFFF;
+  transform: rotate(-6deg) scale(1.08);
+}
+
+.stats article:hover strong { color: var(--c); }
+.stats article:hover small  { color: var(--c); }
+
+.stats article:active { transform: translateY(-2px) scale(0.99); }
+
+.stats article:focus-visible {
+  outline: 3px solid var(--c);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   CHART LEGEND FALLBACK (Recharts)
+   CSS beats the black default fill on legend swatches
+========================================== */
+
+.recharts-legend-item:nth-child(1) .recharts-legend-icon { fill: #E0707A !important; }
+.recharts-legend-item:nth-child(2) .recharts-legend-icon { fill: #E8A04A !important; }
+.recharts-legend-item:nth-child(3) .recharts-legend-icon { fill: #8C79C9 !important; }
+.recharts-legend-item:nth-child(4) .recharts-legend-icon { fill: #4A90C8 !important; }
+.recharts-legend-item:nth-child(5) .recharts-legend-icon { fill: #A3BC45 !important; }
+.recharts-legend-item:nth-child(6) .recharts-legend-icon { fill: #36B0A0 !important; }
+
+.recharts-bar-rectangle path { transition: opacity 0.2s ease; }
+.recharts-bar-rectangle:hover path { opacity: 0.8; }
+
+/* ==========================================
+   LINE CHARTS — each pollutant draws in its own colour
+   Works when every chart sits in <div class="chart-card" data-pollutant="...">
+========================================== */
+
+.chart-card[data-pollutant] .recharts-line-curve,
+.chart-card[data-pollutant] .recharts-area-curve {
+  stroke: var(--p) !important;
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 4px 6px var(--p-soft));
+}
+
+/* area gradient: recolour the gradient stops, keep the fade */
+.chart-card[data-pollutant] linearGradient stop { stop-color: var(--p) !important; }
+
+.chart-card[data-pollutant] .recharts-line-dot,
+.chart-card[data-pollutant] .recharts-dot {
+  stroke: var(--p) !important;
+  fill: #FFFFFF !important;
+  stroke-width: 2px;
+}
+
+.chart-card[data-pollutant] .recharts-active-dot circle {
+  fill: var(--p) !important;
+  stroke: #FFFFFF !important;
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 6px var(--p));
+}
+
+.chart-card[data-pollutant] .recharts-bar-rectangle path { fill: var(--p) !important; }
+
+.chart-card[data-pollutant] .recharts-tooltip-cursor {
+  stroke: var(--p);
+  stroke-dasharray: 4 4;
+  fill: var(--p-soft);
+}
+
+.chart-card[data-pollutant] .recharts-reference-line line { stroke: var(--p); }
+
+/* Grid + axes: soft, so the coloured line is the hero */
+.recharts-cartesian-grid line { stroke: #ECE7F2; stroke-dasharray: 3 5; }
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line { stroke: #D9D2E4; }
+.recharts-cartesian-axis-tick-value { fill: #8A8296; font-size: 11px; font-family: 'DM Sans', sans-serif; }
+
+/* Recharts default tooltip -> match dashboard tooltip */
+.recharts-default-tooltip {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 28px rgba(118,107,145,0.18) !important;
+  font-family: 'DM Sans', sans-serif;
+  background: #FFFFFF !important;
+}
+
+/* ==========================================
+   ATTRACTIVE, INTERACTIVE BACKGROUNDS
+========================================== */
+
+body {
+  background:
+    radial-gradient(700px 380px at 95% -5%,  rgba(224,112,122,0.10), transparent 60%),
+    radial-gradient(700px 380px at 55% -10%, rgba(232,160,74,0.09),  transparent 60%),
+    radial-gradient(700px 420px at 10% 0%,   rgba(54,176,160,0.10),  transparent 60%),
+    radial-gradient(800px 500px at 100% 100%, rgba(140,121,201,0.10), transparent 60%),
+    radial-gradient(700px 500px at 0% 100%,  rgba(74,144,200,0.09),  transparent 60%),
+    #F6F4FA;
+  background-attachment: fixed;
+}
+
+/* Chart cards: tinted glow in the pollutant's colour + lively hover */
+.chart-card {
+  position: relative;
+  background:
+    radial-gradient(260px 160px at 100% 0%, var(--p-soft), transparent 70%),
+    linear-gradient(180deg, #FFFFFF, #FDFCFE);
+  border-radius: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--p);
+  box-shadow: 0 14px 34px var(--p-soft), 0 0 0 1px var(--p);
+}
+
+.chart-card-head h3 .dot { animation: pulse 2.4s ease-in-out infinite; }
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--p-soft); }
+  50%      { box-shadow: 0 0 0 7px var(--p-soft); }
+}
+
+/* Multi-series chart (the city comparison) keeps a neutral white card */
+.chart {
+  background: radial-gradient(500px 200px at 0% 0%, rgba(54,176,160,0.08), transparent 70%),
+              radial-gradient(500px 200px at 100% 0%, rgba(224,112,122,0.08), transparent 70%),
+              #FFFFFF;
+  border-radius: 16px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.chart:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
+/* Section headings get a spectrum marker */
+section h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+section h2::before {
+  content: "";
+  width: 5px;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #E0707A, #E8A04A, #A3BC45, #36B0A0, #4A90C8, #8C79C9);
+}
+
+/* Filter bar: glassy with a spectrum top edge */
+.filters {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(8px);
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, #E0707A, #E8A04A, #A3BC45, #36B0A0, #4A90C8, #8C79C9) 1;
+  border-image-slice: 1;
+}
+
+/* Primary button: gradient + lift */
+button.primary {
+  background: linear-gradient(135deg, #8C79C9, #766B91);
+  box-shadow: 0 6px 16px rgba(118,107,145,0.28);
+}
+button.primary:hover {
+  background: linear-gradient(135deg, #9A88D4, #6E6389);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(118,107,145,0.35);
+}
+
+/* Sidebar links get a spectrum hover */
+aside a:hover { transform: translateX(3px); }
+
+/* Table rows pick up a soft lavender highlight */
+tbody tr { transition: background 0.2s ease; }
+tbody tr:hover td { background: #F3EEFA; }
+
+/* Summary pollutant cards: stronger hover glow in own colour */
+.pollutant-summary article:hover { box-shadow: 0 12px 28px var(--p-soft), 0 0 0 1px var(--p); }
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-card-head h3 .dot { animation: none; }
+}
+
+/* ==========================================
+   CITY COMPARISON BAR CHART — bars match legend colours
+   (counts only the .recharts-bar groups, so other chart parts don't shift the order)
+========================================== */
+
+.recharts-bar:nth-child(1 of .recharts-bar) .recharts-bar-rectangle path,
+.recharts-bar:nth-child(1 of .recharts-bar) .recharts-bar-rectangle rect { fill: #E0707A !important; } /* PM2.5 */
+.recharts-bar:nth-child(2 of .recharts-bar) .recharts-bar-rectangle path,
+.recharts-bar:nth-child(2 of .recharts-bar) .recharts-bar-rectangle rect { fill: #E8A04A !important; } /* PM10  */
+.recharts-bar:nth-child(3 of .recharts-bar) .recharts-bar-rectangle path,
+.recharts-bar:nth-child(3 of .recharts-bar) .recharts-bar-rectangle rect { fill: #8C79C9 !important; } /* CO    */
+.recharts-bar:nth-child(4 of .recharts-bar) .recharts-bar-rectangle path,
+.recharts-bar:nth-child(4 of .recharts-bar) .recharts-bar-rectangle rect { fill: #4A90C8 !important; } /* NO2   */
+.recharts-bar:nth-child(5 of .recharts-bar) .recharts-bar-rectangle path,
+.recharts-bar:nth-child(5 of .recharts-bar) .recharts-bar-rectangle rect { fill: #A3BC45 !important; } /* SO2   */
+.recharts-bar:nth-child(6 of .recharts-bar) .recharts-bar-rectangle path,
+.recharts-bar:nth-child(6 of .recharts-bar) .recharts-bar-rectangle rect { fill: #36B0A0 !important; } /* O3    */
+
+.recharts-bar-rectangle path { rx: 4px; transition: opacity 0.2s ease, filter 0.2s ease; }
+.recharts-bar-rectangle:hover path { opacity: 1; filter: brightness(1.08) drop-shadow(0 4px 8px rgba(78,70,92,0.25)); }
+
+/* ==========================================
+   CORRELATION MATRIX — cell styling
+   (colours themselves are set per cell in JS, see instructions)
+========================================== */
+
+.matrixrow span {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border: 1px solid rgba(255,255,255,0.6);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+.matrixrow span.diag { color: #FFFFFF; font-weight: 800; text-shadow: 0 1px 2px rgba(0,0,0,0.18); }
+.matrixrow span.neg  { border: 1px dashed rgba(78,70,92,0.45); }
+.matrixrow span:hover { filter: saturate(1.25); transform: scale(1.1); }
+
+.matrixrow b { display: flex; align-items: center; gap: 6px; color: var(--text-main); }
+.matrixrow b::before {
+  content: "";
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--p, var(--accent-purple));
+}
+.matrixrow:nth-child(1) b { --p: #E0707A; }
+.matrixrow:nth-child(2) b { --p: #E8A04A; }
+.matrixrow:nth-child(3) b { --p: #8C79C9; }
+.matrixrow:nth-child(4) b { --p: #4A90C8; }
+.matrixrow:nth-child(5) b { --p: #A3BC45; }
+.matrixrow:nth-child(6) b { --p: #36B0A0; }
+
+/* Safety: keep bar colours coming from the JSX (fill prop); stop old fallbacks fighting them */
+.recharts-bar-rectangle path { rx: 0; }
+
+/* ==========================================
+   PREMIUM MOTION LAYER
+   transform / opacity only (GPU friendly)
+========================================== */
+
+@keyframes rise  { from { opacity: 0; transform: translateY(18px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes popin { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+@keyframes drift { 0%,100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-30px,0); } }
+@keyframes bob   { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@keyframes rowin { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@keyframes glowpulse { 0%,100% { box-shadow: 0 0 0 1px var(--p-soft), 0 6px 22px var(--p-soft); } 50% { box-shadow: 0 0 0 1px var(--p), 0 10px 34px var(--p-soft); } }
+@keyframes toastin { from { opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: none; } }
+
+.reveal { animation: rise .75s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0ms); }
+.app-in { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
+.pop    { animation: popin .45s cubic-bezier(.2,.8,.3,1.2) both; }
+.rowin  { animation: rowin .4s ease both; }
+.float  { display: inline-flex; animation: bob 3.6s ease-in-out infinite; }
+
+/* Ambient background: three slow colour glows */
+.ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.ambient i { position: absolute; width: 520px; height: 520px; border-radius: 50%; filter: blur(90px); opacity: .22; animation: drift 24s ease-in-out infinite; }
+.ambient i:nth-child(1) { background: #8C79C9; top: -160px; left: 18%; }
+.ambient i:nth-child(2) { background: #36B0A0; bottom: -200px; right: 8%; animation-delay: -8s; }
+.ambient i:nth-child(3) { background: #E0707A; top: 40%; right: -200px; animation-delay: -15s; opacity: .14; }
+
+/* Pollutant glow on the trend chart */
+.chart.glow[data-pollutant] { animation: rise .75s cubic-bezier(.2,.7,.2,1) both, glowpulse 4s ease-in-out 1s infinite; border-color: var(--p); transition: border-color .4s; }
+
+/* Sidebar */
+aside a { display: flex; align-items: center; gap: 10px; position: relative; }
+aside a .ico { display: inline-block; transition: transform .3s cubic-bezier(.3,1.4,.5,1); }
+aside a:hover .ico { transform: scale(1.3) rotate(-8deg); }
+aside a.active { box-shadow: inset 3px 0 0 var(--accent-purple); }
+aside a::before { content: ""; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; border-radius: 3px; background: var(--accent-purple); transform: scaleY(0); transition: transform .3s ease; }
+aside a.active::before { transform: scaleY(1); }
+
+/* Buttons */
+button { transition: transform .15s ease, background .2s, border-color .2s, box-shadow .2s; }
+button:active:not(:disabled) { transform: scale(.96); }
+button.spinning svg { animation: spin .9s linear infinite; }
+.status { display: flex; align-items: center; gap: 8px; }
+.live { width: 9px; height: 9px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 0 var(--good); }
+.live.on { background: var(--moderate); animation: livepulse 1.2s ease-out infinite; }
+@keyframes livepulse { to { box-shadow: 0 0 0 9px rgba(227,196,91,0); } }
+
+/* Skeleton loaders */
+.skeleton { border-radius: 10px; background: linear-gradient(90deg, #EFEBF5 25%, #F8F6FB 50%, #EFEBF5 75%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+.sk-num { height: 26px; width: 70%; }
+.sk-chart { height: 100%; min-height: 240px; }
+.sk-row { height: 18px; }
+
+/* Toast */
+.toast { position: fixed; right: 22px; bottom: 22px; z-index: 50; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; color: #fff; box-shadow: 0 12px 30px rgba(78,70,92,.25); animation: toastin .35s cubic-bezier(.2,.8,.3,1.2) both; }
+.toast.ok  { background: var(--good); }
+.toast.err { background: var(--unhealthy); }
+
+/* Welcome screen */
+.welcome { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; text-align: center; z-index: 100;
+  background: linear-gradient(120deg, #F6F4FA, #E9F4F0, #F1E9F5, #F6F4FA); background-size: 300% 300%; animation: bgflow 18s ease infinite;
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease; }
+.welcome.leaving { opacity: 0; transform: scale(1.05); filter: blur(6px); pointer-events: none; }
+@keyframes bgflow { 50% { background-position: 100% 50%; } }
+.pt { position: absolute; bottom: -20px; border-radius: 50%; opacity: 0; animation: floatup linear infinite; }
+@keyframes floatup { 0% { transform: translate3d(0,0,0); opacity: 0; } 15% { opacity: .35; } 100% { transform: translate3d(60px,-110vh,0); opacity: 0; } }
+.welcome-inner { position: relative; padding: 24px; max-width: 720px; }
+.w-logo { width: 78px; height: 78px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 24px; color: #fff;
+  background: linear-gradient(135deg, #8C79C9, #36B0A0); box-shadow: 0 14px 40px rgba(140,121,201,.4); animation: logoin 1s cubic-bezier(.2,.8,.3,1.3) both; }
+@keyframes logoin { from { opacity: 0; transform: scale(.4) rotate(-90deg); } to { opacity: 1; transform: none; } }
+.w-eyebrow { letter-spacing: 3px; font-weight: 700; color: var(--accent-green); animation: rise .8s .3s both; display: block; }
+.w-title { font: 800 clamp(34px, 6vw, 62px)/1.1 Manrope, sans-serif; margin: 14px 0; color: var(--text-main); }
+.w-title span { display: inline-block; animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
+.w-sub { color: var(--text-muted); font-size: 15px; animation: rise .8s 1.3s both; }
+.w-dots { display: flex; gap: 8px; justify-content: center; margin: 22px 0; animation: rise .8s 1.4s both; }
+.w-dots i { width: 10px; height: 10px; border-radius: 50%; animation: bob 2.4s ease-in-out infinite; }
+.w-dots i:nth-child(2n) { animation-delay: -.8s; }
+.cta { margin: 0 auto; padding: 14px 30px; font-size: 14px; font-weight: 700; border: 0; border-radius: 999px; color: #fff;
+  background: linear-gradient(135deg, #8C79C9, #766B91); animation: rise .8s 1.6s both, ctaglow 2.6s ease-in-out 2.4s infinite; }
+.cta:hover { transform: translateY(-3px) scale(1.04); background: linear-gradient(135deg, #9A88D4, #6E6389); }
+@keyframes ctaglow { 0%,100% { box-shadow: 0 8px 22px rgba(118,107,145,.35); } 50% { box-shadow: 0 8px 36px rgba(140,121,201,.65); } }
+
+/* Mobile navigation drawer */
+.menu-btn, .scrim { display: none; }
+@media (max-width: 900px) {
+  .menu-btn { display: flex; position: fixed; top: 12px; left: 12px; z-index: 30; padding: 9px; box-shadow: var(--shadow); }
+  .scrim { display: block; position: fixed; inset: 0; background: rgba(78,70,92,.35); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 11; }
+  .scrim.show { opacity: 1; pointer-events: auto; }
+  aside { position: fixed; inset: 0 auto 0 0; width: 250px; display: flex; flex-direction: column; align-items: stretch; flex-wrap: nowrap;
+    padding: 27px 20px; transform: translateX(-105%); transition: transform .35s cubic-bezier(.2,.8,.2,1); z-index: 12; }
+  aside.open { transform: none; }
+  aside p, .asidefoot { display: block; }
+  aside::after { inset: 0 0 0 auto; width: 3px; height: auto; background: linear-gradient(180deg, var(--good), var(--moderate), var(--unhealthy-sensitive), var(--unhealthy), var(--very-unhealthy), var(--hazardous)); }
+  header { padding-top: 62px; }
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ==========================================
+   MULTI-PAGE LAYER: page transitions + option controls
+========================================== */
+
+@keyframes pagein  { from { opacity: 0; transform: translateX(26px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes pageout { to   { opacity: 0; transform: translateX(-22px) scale(.985); } }
+@keyframes growx   { from { width: 0; } to { width: var(--w); } }
+
+.page { position: relative; animation: pagein .5s cubic-bezier(.2,.7,.2,1) both; }
+.page.out { animation: pageout .22s ease forwards; pointer-events: none; }
+/* every page gets its own soft colour glow + accent */
+.page::before { content: ""; position: absolute; inset: -20px -10px auto -10px; height: 260px; z-index: -1; pointer-events: none;
+  background: radial-gradient(520px 200px at 20% 0%, color-mix(in srgb, var(--pg) 16%, transparent), transparent 70%); }
+.pagehead { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.pagehead h2 { font-size: 22px; }
+.pagehead h2::before { background: var(--pg); }
+.sub-h { margin-top: 28px; font-size: 16px; }
+
+/* option controls */
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; margin: 16px 0 4px; }
+.ctl { display: flex; flex-direction: column; gap: 6px; }
+.cl { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+.seg { display: inline-flex; gap: 4px; padding: 4px; background: rgba(255,255,255,.75); backdrop-filter: blur(6px);
+  border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow); }
+.seg button { border: 0; background: transparent; padding: 8px 14px; border-radius: 9px; font-weight: 600; color: var(--text-muted); }
+.seg button.on { background: var(--pg, #766B91); color: #fff; box-shadow: 0 4px 12px rgba(78,70,92,.2); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1.5px solid var(--p); color: var(--p); background: #fff; border-radius: 999px; padding: 7px 13px; font-weight: 700; }
+.chip.on { background: var(--p); color: #fff; box-shadow: 0 5px 14px color-mix(in srgb, var(--p) 40%, transparent); }
+.chip:not(.on) { opacity: .65; }
+
+.chart.tall { height: 420px; margin-top: 16px; }
+
+/* trend insight cards */
+.insights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-top: 14px; }
+.ins { background: #fff; border: 1px solid var(--border-color); border-left: 4px solid var(--p); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); display: grid; gap: 4px; }
+.ins small { font-size: 10px; letter-spacing: 1px; color: var(--p-ink); font-weight: 700; text-transform: uppercase; }
+.ins strong { font: 700 18px Manrope; }
+
+/* overview pollutant tiles: six across */
+.pollutant-summary { grid-template-columns: repeat(6, 1fr); }
+@media (max-width: 1100px) { .pollutant-summary { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 520px)  { .pollutant-summary { grid-template-columns: repeat(2, 1fr); } .insights { grid-template-columns: 1fr; } }
+
+/* ranked / focus correlation bars */
+.cbars { display: grid; gap: 10px; margin-top: 16px; }
+.cbar { display: grid; grid-template-columns: 190px 1fr 52px; gap: 14px; align-items: center; }
+.cl2 { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; }
+.cl2 i { width: 9px; height: 9px; border-radius: 50%; }
+.track { height: 16px; background: #EFEBF5; border-radius: 10px; overflow: hidden; }
+.track em { display: block; height: 100%; border-radius: 10px; width: var(--w); animation: growx .9s cubic-bezier(.2,.7,.2,1) both; }
+.track em.neg { outline: 2px dashed rgba(78,70,92,.55); outline-offset: -3px; opacity: .8; }
+.cbar b { font: 700 13px Manrope; text-align: right; }
+@media (max-width: 600px) { .cbar { grid-template-columns: 1fr 44px; } .cl2 { grid-column: 1 / -1; } }
+
+/* charts must always have a real height */
+.chart, .chart.tall { min-height: 320px; }
+.chart .recharts-responsive-container { min-height: 300px; }
