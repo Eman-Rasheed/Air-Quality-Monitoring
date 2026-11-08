@@ -1,8 +1,8 @@
-
 import os
 import threading
+import time
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 
@@ -169,7 +169,45 @@ app.add_middleware(
 # DATABASE SESSION
 # --------------------------------------------------
 
+_last_refresh_try = 0.0
+
+
+def refresh_if_stale():
+
+    global _last_refresh_try, etl_status
+
+    if time.time() - _last_refresh_try < 300:
+        return
+
+    if not historical_lock.acquire(blocking=False):
+        return
+
+    try:
+        _last_refresh_try = time.time()
+
+        with SessionLocal() as db:
+            latest = db.query(
+                func.max(AirQualityRecord.timestamp)
+            ).scalar()
+
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+        if latest is None or now - latest > timedelta(hours=2):
+            etl_status = run_etl()
+
+    except Exception as exc:
+        etl_status = {
+            "status": "error",
+            "message": str(exc)
+        }
+
+    finally:
+        historical_lock.release()
+
+
 def db_session():
+
+    refresh_if_stale()
 
     db = SessionLocal()
 
