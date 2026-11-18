@@ -1,4 +1,3 @@
-
 import logging
 import time
 from datetime import datetime, timezone
@@ -40,9 +39,9 @@ def fetch_city(city, coords):
         "latitude": lat,
         "longitude": lon,
         "hourly": ",".join(POLLUTANTS),
-        "timezone": "Asia/Karachi",
+        "timezone": "GMT",
         "past_days": PAST_DAYS,
-        "forecast_days": 0,
+        "forecast_days": 1,
     }
 
     response = requests.get(
@@ -75,6 +74,10 @@ def fetch_city(city, coords):
         df.pop("time"),
         errors="coerce"
     )
+
+    # Keep only hours that have already happened (UTC)
+    now_utc = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    df = df[df["timestamp"] <= now_utc].reset_index(drop=True)
 
     logging.info(
         "%s: Extracted %d records",
@@ -220,10 +223,6 @@ def validate_rows(df):
 
     return valid, rejected
 
-
-# --------------------------------------------------
-# 4. LOAD: Save validated records into SQLite
-# --------------------------------------------------
 
 # --------------------------------------------------
 # 4. LOAD: Save validated records into SQLite

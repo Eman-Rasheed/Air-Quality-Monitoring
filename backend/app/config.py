@@ -1,20 +1,41 @@
-
+import os
+import shutil
 from pathlib import Path
 
 # Project directories
-BACKEND = Path(__file__).resolve().parents[1]
+BACKEND = Path(_file_).resolve().parents[1]
 
 DATA = BACKEND / "data"
-RAW = DATA / "raw"
-PROCESSED = DATA / "processed"
-REPORTS = BACKEND / "reports"
+
+if os.environ.get("VERCEL"):
+    # Vercel's project folder is read-only, so write working files to /tmp
+    WORK = Path("/tmp")
+    RAW = WORK / "raw"
+    PROCESSED = WORK / "processed"
+    REPORTS = WORK / "reports"
+else:
+    RAW = DATA / "raw"
+    PROCESSED = DATA / "processed"
+    REPORTS = BACKEND / "reports"
 
 # Create directories automatically
 for folder in [RAW, PROCESSED, REPORTS]:
-    folder.mkdir(parents=True, exist_ok=True)
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        pass
 
 # Database configuration
-DB = DATA / "air_quality.db"
+DB_SOURCE = DATA / "air_quality.db"
+
+if os.environ.get("VERCEL"):
+    # Work from a copy of the database in /tmp
+    DB = Path("/tmp/air_quality.db")
+    if DB_SOURCE.exists() and not DB.exists():
+        shutil.copyfile(DB_SOURCE, DB)
+else:
+    DB = DB_SOURCE
+
 DATABASE_URL = f"sqlite:///{DB.as_posix()}"
 
 # Data collection settings
